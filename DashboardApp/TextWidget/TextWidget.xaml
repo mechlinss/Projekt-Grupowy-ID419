@@ -1,0 +1,10 @@
+﻿<UserControl x:Class="TextWidget.TextWidget"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="150" Width="300">
+    <StackPanel Margin="10">
+        <TextBlock Text="Analiza tekstu:" FontWeight="Bold"/>
+        <TextBlock x:Name="CharCount" Text="Znaki: 0"/>
+        <TextBlock x:Name="WordCount" Text="Słowa: 0"/>
+    </StackPanel>
+</UserControl>

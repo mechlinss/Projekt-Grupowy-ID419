@@ -1,0 +1,9 @@
+﻿<UserControl x:Class="ChartsWidget.ChartsWidget"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="200" Width="400">
+    <StackPanel Margin="10">
+        <TextBlock Text="Wykres liczb:" FontWeight="Bold" Margin="0,0,0,10"/>
+        <StackPanel x:Name="Bars" Orientation="Horizontal" VerticalAlignment="Bottom"/>
+    </StackPanel>
+</UserControl>
