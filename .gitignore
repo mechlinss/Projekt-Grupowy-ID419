@@ -1,1 +1,28 @@
 .DS_Store
+
+# Build outputs
+**/[Bb]in/
+**/[Oo]bj/
+**/[Dd]ebug/
+**/[Rr]elease/
+**/x64/
+**/x86/
+**/artifacts/
+
+# Visual Studio cache and workspace files
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Logs and test results
+*.log
+TestResults/
+*.trx
+
+# NuGet
+packages/
+*.nupkg
+*.snupkg
+
