@@ -1,7 +1,7 @@
 ## Structure & Scripts
 
 ### 1. watershed_with_preprocessing.py
-This is the core script of the project. It performs advanced image segmentation based on the Marker-controlled Watershed algorithm applied to a morphological gradient.
+It performs advanced image segmentation based on the Marker-controlled Watershed algorithm applied to a morphological gradient.
 
 
 
