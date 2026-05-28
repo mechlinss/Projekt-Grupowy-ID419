@@ -97,14 +97,12 @@
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Utnij dół (px):" Foreground="#888" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <TextBox x:Name="CropBottomBox" Width="80" Text="0" Margin="0,0,12,0"/>
                     <Button x:Name="BtnLoad" Content="📂  Wczytaj zdjęcie"
                             Style="{StaticResource ActionButton}"
                             Margin="0,0,8,0"
                             Click="BtnLoad_Click"/>
-                    <Button x:Name="BtnReset" Content="↺  Reset zaznaczenia"
-                            Style="{StaticResource ActionButton}"
-                            Margin="0,0,8,0"
-                            Click="BtnReset_Click" IsEnabled="False"/>
                     <Button x:Name="BtnCrop" Content="Przytnij i przekaż"
                             Style="{StaticResource GreenButton}"
                             Click="BtnCrop_Click" IsEnabled="False"/>
@@ -117,15 +115,6 @@
                     CornerRadius="12" Margin="40"
                     Background="#111111"
                     AllowDrop="True" Drop="Canvas_Drop" DragOver="Canvas_DragOver">
-                <Border.Style>
-                    <Style TargetType="Border">
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding ElementName=ImageDisplay, Path=Source}" Value="{x:Null}">
-                                <Setter Property="Visibility" Value="Visible"/>
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Border.Style>
                 <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
                     <TextBlock Text="📁" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,12"/>
                     <TextBlock Text="Przeciągnij zdjęcie tutaj" FontSize="18" FontWeight="SemiBold"
@@ -139,57 +128,21 @@
                 </StackPanel>
             </Border>
 
-            <ScrollViewer x:Name="ImageScrollViewer"
-                          HorizontalScrollBarVisibility="Auto"
-                          VerticalScrollBarVisibility="Auto"
-                          Background="Transparent"
-                          AllowDrop="True" Drop="Canvas_Drop" DragOver="Canvas_DragOver">
-                <Grid HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20">
-                    <Image x:Name="ImageDisplay"
-                           Stretch="None"
-                           RenderOptions.BitmapScalingMode="HighQuality"/>
-
-                    <Canvas x:Name="CropCanvas"
-                            Background="Transparent"
-                            MouseLeftButtonDown="CropCanvas_MouseDown"
-                            MouseMove="CropCanvas_MouseMove"
-                            MouseLeftButtonUp="CropCanvas_MouseUp"
-                            Cursor="Cross">
-
-                        <Rectangle x:Name="OverlayTop" Fill="#88000000" IsHitTestVisible="False"/>
-                        <Rectangle x:Name="OverlayBottom" Fill="#88000000" IsHitTestVisible="False"/>
-                        <Rectangle x:Name="OverlayLeft" Fill="#88000000" IsHitTestVisible="False"/>
-                        <Rectangle x:Name="OverlayRight" Fill="#88000000" IsHitTestVisible="False"/>
-
-                        <Rectangle x:Name="CropRect"
-                                   Stroke="#3B82F6"
-                                   StrokeThickness="2"
-                                   Fill="Transparent"
-                                   IsHitTestVisible="False"
-                                   Visibility="Collapsed">
-                            <Rectangle.StrokeDashArray>
-                                <DoubleCollection>6,3</DoubleCollection>
-                            </Rectangle.StrokeDashArray>
-                        </Rectangle>
-
-                        <Line x:Name="GridH1" Stroke="#443B82F6" StrokeThickness="1" IsHitTestVisible="False" Visibility="Collapsed"/>
-                        <Line x:Name="GridH2" Stroke="#443B82F6" StrokeThickness="1" IsHitTestVisible="False" Visibility="Collapsed"/>
-                        <Line x:Name="GridV1" Stroke="#443B82F6" StrokeThickness="1" IsHitTestVisible="False" Visibility="Collapsed"/>
-                        <Line x:Name="GridV2" Stroke="#443B82F6" StrokeThickness="1" IsHitTestVisible="False" Visibility="Collapsed"/>
-
-                        <Rectangle x:Name="HandleTL" Width="10" Height="10" Fill="#3B82F6" IsHitTestVisible="False" Visibility="Collapsed" RadiusX="2" RadiusY="2"/>
-                        <Rectangle x:Name="HandleTR" Width="10" Height="10" Fill="#3B82F6" IsHitTestVisible="False" Visibility="Collapsed" RadiusX="2" RadiusY="2"/>
-                        <Rectangle x:Name="HandleBL" Width="10" Height="10" Fill="#3B82F6" IsHitTestVisible="False" Visibility="Collapsed" RadiusX="2" RadiusY="2"/>
-                        <Rectangle x:Name="HandleBR" Width="10" Height="10" Fill="#3B82F6" IsHitTestVisible="False" Visibility="Collapsed" RadiusX="2" RadiusY="2"/>
-
-                        <Border x:Name="SizeTooltip" Background="#CC000000" CornerRadius="4"
-                                Padding="6,3" IsHitTestVisible="False" Visibility="Collapsed">
-                            <TextBlock x:Name="SizeLabel" Foreground="#3B82F6"
-                                       FontFamily="Consolas" FontSize="11"/>
+            <ListView x:Name="ResultsList" Margin="20" Background="#0A0A0A" BorderThickness="0">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BorderBrush="#222" BorderThickness="1" Padding="8" Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Width="120" Height="120" Source="{Binding ResultImage}" Stretch="Uniform"/>
+                                <StackPanel Margin="12,0,0,0">
+                                    <TextBlock Text="{Binding FileName}" Foreground="#EEE" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding VariablesDisplay}" Foreground="#7FB2FF" FontFamily="Consolas"/>
+                                </StackPanel>
+                            </StackPanel>
                         </Border>
-                    </Canvas>
-                </Grid>
-            </ScrollViewer>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
         </Grid>
 
         <Border Grid.Row="2" Background="#141414" BorderBrush="#222222" BorderThickness="0,1,0,0" Height="30">
