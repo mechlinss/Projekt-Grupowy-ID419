@@ -1,0 +1,125 @@
+<Window x:Class="DashboardApp.LivePreviewWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Podgląd na żywo"
+        Height="700" Width="1100"
+        MinHeight="500" MinWidth="800"
+        Background="#0F0F0F"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+        <Style x:Key="ActionBtn" TargetType="Button">
+            <Setter Property="Background" Value="#1E1E1E"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderBrush" Value="#333"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2A2A2A"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#141414"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.4"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="ApplyBtn" TargetType="Button" BasedOn="{StaticResource ActionBtn}">
+            <Setter Property="Background" Value="#2563EB"/>
+            <Setter Property="BorderBrush" Value="#3B82F6"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#1D4ED8"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="290"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Result image -->
+        <Border Grid.Column="0" Background="#0A0A0A">
+            <Grid>
+                <Image x:Name="PreviewImage" Stretch="Uniform" Margin="16"/>
+                <Border x:Name="LoadingOverlay" Background="#AA000000" Visibility="Collapsed">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="⏳" FontSize="36" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Analizuję..." Foreground="#AAAAAA"
+                                   FontFamily="Segoe UI" FontSize="14"
+                                   HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- Parameters panel -->
+        <Border Grid.Column="1" Background="#141414" BorderBrush="#222" BorderThickness="1,0,0,0">
+            <Grid Margin="20,20,20,16">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0">
+                    <TextBlock x:Name="ScriptNameLabel" Foreground="#F0F0F0"
+                               FontSize="14" FontWeight="SemiBold" FontFamily="Segoe UI"
+                               TextWrapping="Wrap"/>
+                    <TextBlock x:Name="FileNameLabel" Foreground="#555" FontSize="11"
+                               FontFamily="Segoe UI" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                    <Border Height="1" Background="#222" Margin="0,12,0,0"/>
+                </StackPanel>
+
+                <!-- Dynamic sliders injected here in code-behind -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+                    <StackPanel x:Name="ParamsPanel"/>
+                </ScrollViewer>
+
+                <StackPanel Grid.Row="2" Margin="0,12,0,0">
+                    <!-- Result count -->
+                    <Border Background="#0F0F0F" CornerRadius="6" Padding="12,8" Margin="0,0,0,12">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Wynik: " Foreground="#666" FontFamily="Segoe UI" FontSize="12" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="ResultLabel" Foreground="#22C55E"
+                                       FontFamily="Consolas" FontSize="18" FontWeight="SemiBold"/>
+                        </StackPanel>
+                    </Border>
+                    <Button x:Name="BtnApply" Content="🔄  Odśwież podgląd"
+                            Style="{StaticResource ActionBtn}"
+                            HorizontalAlignment="Stretch"
+                            Click="BtnApply_Click"/>
+                    <Button x:Name="BtnConfirm" Content="✔  Zastosuj do wszystkich zdjęć"
+                            Style="{StaticResource ApplyBtn}"
+                            HorizontalAlignment="Stretch" Margin="0,8,0,0"
+                            Click="BtnConfirm_Click"/>
+                    <Button Content="Anuluj" Style="{StaticResource ActionBtn}"
+                            HorizontalAlignment="Stretch" Margin="0,8,0,0"
+                            Click="BtnClose_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

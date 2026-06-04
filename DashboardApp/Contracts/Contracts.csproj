@@ -10,9 +10,8 @@
 		<PackageReference Include="System.ComponentModel.Composition" Version="10.0.5" />
 	</ItemGroup>
 
-	<!-- Automatyczne kopiowanie Contracts.dll do Plugins -->
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(SolutionDir)DashboardApp\bin\Debug\net8.0-windows\Plugins" />
+		<Copy SourceFiles="$(TargetPath)" DestinationFolder="$(MSBuildThisFileDirectory)..\DashboardApp\bin\Debug\net8.0-windows\Plugins" />
 	</Target>
 
 </Project>

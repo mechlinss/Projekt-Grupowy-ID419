@@ -1,33 +1,24 @@
 import cv2
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import csv
 import os
-import argparse
+import sys
+import json
 
-# --- Reading arguments from console  ---
+if len(sys.argv) < 3:
+    print(json.dumps({"ERROR": "Usage: analyze_results.py <input_label_map> <output_histogram_path>"}))
+    sys.exit(1)
 
-parser = argparse.ArgumentParser(description='Statistical analysis of grains from the label map.')
-parser.add_argument('--input', type=str, default='results/label_map.tif', help='Path to the label map')
-parser.add_argument('--output_dir', type=str, default='results', help='Directory to save the results')
-parser.add_argument('--scale', type=float, default=1.0, help='Scale: Number of pixels per 1 physical unit (e.g. pixels per 1 um)')
-parser.add_argument('--unit', type=str, default='px', help='Unit symbol (np. um, mm)')
-parser.add_argument('--min_area', type=float, default=0.0, help='Minimum grain size (in physical units) for noise rejection')
+INPUT_MAP = sys.argv[1]
+output_path = sys.argv[2]
+OUTPUT_DIR = os.path.dirname(output_path) or '.'
 
-args = parser.parse_args()
-
-INPUT_MAP = args.input
-OUTPUT_DIR = args.output_dir
-SCALE_PX_PER_UNIT = args.scale
-UNIT = args.unit
-MIN_AREA_PHYS = args.min_area
-
-# Hardcoded values for debugging
-INPUT_MAP = 'results/label_map.tif'
-OUTPUT_DIR = 'results'
 SCALE_PX_PER_UNIT = 680.0
 UNIT = 'um'
-MIN_AREA_PHYS = 50.0/(SCALE_PX_PER_UNIT*SCALE_PX_PER_UNIT)
+MIN_AREA_PHYS = 50.0 / (SCALE_PX_PER_UNIT * SCALE_PX_PER_UNIT)
 
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
@@ -63,8 +54,8 @@ for grain_id, px_count in zip(unique_ids, pixel_counts):
 valid_grain_count = len(areas_physical)
 
 if valid_grain_count == 0:
-    print("Warning: Haven't found any valid grains!")
-    exit(0)
+    print(json.dumps({"ERROR": "Haven't found any valid grains"}))
+    sys.exit(0)
 
 areas_physical = np.array(areas_physical)
 
@@ -116,18 +107,10 @@ plt.axvline(mean_area, color='red', linestyle='dashed', linewidth=2, label=f'Ave
 plt.axvline(median_area, color='green', linestyle='dashed', linewidth=2, label=f'Median: {median_area:.5f}')
 plt.legend()
 
-# Zapis wykresu
-plot_path = os.path.join(OUTPUT_DIR, 'distribution_histogram.png')
-plt.savefig(plot_path, dpi=300, bbox_inches='tight')
+plt.savefig(output_path, dpi=300, bbox_inches='tight')
 
-# Printing results to the console
-print("=== ANALYSIS RESULTS ===")
-print(f"Number of segments: {valid_grain_count}")
-print(f"Average Area: {mean_area:.5f} {UNIT}^2")
-print(f"Median Area: {median_area:.5f} {UNIT}^2")
-print(f"Standard deviation: {std_dev:.5f} {UNIT}^2")
-print(f"Smallest grain: {min_area:.5f} {UNIT}^2")
-print(f"Biggest grain: {max_area:.5f} {UNIT}^2")
-print("======================")
-print(f"CSV report saved to: {csv_path}")
-print(f"Histogram saved to: {plot_path}")
+print(json.dumps({
+    "Ilosc krysztalow": valid_grain_count,
+    "Srednia powierzchnia (px2)": round(mean_area, 5),
+    "Status": "OK"
+}))

@@ -7,6 +7,88 @@
         MinWidth="800" MinHeight="600">
 
     <Window.Resources>
+        <Style x:Key="DarkComboBox" TargetType="ComboBox">
+            <Setter Property="Background" Value="#1E1E1E"/>
+            <Setter Property="Foreground" Value="#F0F0F0"/>
+            <Setter Property="BorderBrush" Value="#444444"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="MinWidth" Value="220"/>
+            <Setter Property="ItemContainerStyle">
+                <Setter.Value>
+                    <Style TargetType="ComboBoxItem">
+                        <Setter Property="Background" Value="#1E1E1E"/>
+                        <Setter Property="Foreground" Value="#F0F0F0"/>
+                        <Setter Property="Padding" Value="10,6"/>
+                        <Setter Property="FontFamily" Value="Segoe UI"/>
+                        <Setter Property="FontSize" Value="13"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#2A2A2A"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="#2563EB"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ComboBox">
+                        <Grid>
+                            <Border x:Name="Border"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6"/>
+                            <Grid Margin="10,0,4,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="20"/>
+                                </Grid.ColumnDefinitions>
+                                <ContentPresenter Grid.Column="0"
+                                                  Content="{TemplateBinding SelectionBoxItem}"
+                                                  ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                                  VerticalAlignment="Center"
+                                                  TextBlock.Foreground="#F0F0F0"
+                                                  TextBlock.FontFamily="Segoe UI"
+                                                  TextBlock.FontSize="13"/>
+                                <Path Grid.Column="1" Data="M 0 0 L 6 6 L 12 0"
+                                      Stroke="#888" StrokeThickness="1.5"
+                                      VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                            </Grid>
+                            <ToggleButton Focusable="False" IsChecked="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"
+                                          Background="Transparent" BorderThickness="0" Opacity="0"/>
+                            <Popup x:Name="PART_Popup"
+                                   IsOpen="{TemplateBinding IsDropDownOpen}"
+                                   AllowsTransparency="True" Focusable="False"
+                                   Placement="Bottom" PopupAnimation="Slide">
+                                <Border Background="#1E1E1E" BorderBrush="#444" BorderThickness="1"
+                                        CornerRadius="6" MinWidth="{TemplateBinding ActualWidth}"
+                                        Effect="{x:Null}">
+                                    <ScrollViewer MaxHeight="200">
+                                        <ItemsPresenter/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Popup>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#666"/>
+                            </Trigger>
+                            <Trigger Property="IsDropDownOpen" Value="True">
+                                <Setter TargetName="Border" Property="BorderBrush" Value="#2563EB"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
         <Style x:Key="ActionButton" TargetType="Button">
             <Setter Property="Background" Value="#1E1E1E"/>
             <Setter Property="Foreground" Value="#E0E0E0"/>
@@ -97,6 +179,11 @@
                            HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Skrypt:" Foreground="#888" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                    <ComboBox x:Name="ScriptSelector"
+                              Style="{StaticResource DarkComboBox}"
+                              Margin="0,0,12,0"
+                              SelectedIndex="0"/>
                     <TextBlock Text="Utnij dół (px):" Foreground="#888" Margin="0,0,6,0" VerticalAlignment="Center"/>
                     <TextBox x:Name="CropBottomBox" Width="80" Text="0" Margin="0,0,12,0"/>
                     <Button x:Name="BtnLoad" Content="📂  Wczytaj zdjęcie"
@@ -128,21 +215,106 @@
                 </StackPanel>
             </Border>
 
-            <ListView x:Name="ResultsList" Margin="20" Background="#0A0A0A" BorderThickness="0">
+            <ListView x:Name="ResultsList" Margin="20" Background="#0A0A0A" BorderThickness="0"
+                      MouseDoubleClick="ResultsList_DoubleClick">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Background" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Cursor" Value="Hand"/>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="Transparent"/>
+                            </Trigger>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="Background" Value="Transparent"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListView.ItemContainerStyle>
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <Border BorderBrush="#222" BorderThickness="1" Padding="8" Margin="0,0,0,8">
+                        <Border BorderBrush="#222" BorderThickness="1" Padding="8" Margin="0,0,0,8"
+                                CornerRadius="6">
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background" Value="#111111"/>
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsMouseOver, RelativeSource={RelativeSource AncestorType=ListViewItem}}" Value="True">
+                                            <Setter Property="Background" Value="#1C1C1C"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
                             <StackPanel Orientation="Horizontal">
                                 <Image Width="120" Height="120" Source="{Binding ResultImage}" Stretch="Uniform"/>
-                                <StackPanel Margin="12,0,0,0">
-                                    <TextBlock Text="{Binding FileName}" Foreground="#EEE" FontWeight="SemiBold"/>
-                                    <TextBlock Text="{Binding VariablesDisplay}" Foreground="#7FB2FF" FontFamily="Consolas"/>
+                                <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding FileName}" Foreground="#EEE" FontWeight="SemiBold" FontFamily="Segoe UI"/>
+                                    <TextBlock Text="{Binding VariablesDisplay}" Foreground="#7FB2FF" FontFamily="Consolas" Margin="0,6,0,0"/>
+                                    <TextBlock Text="Kliknij dwukrotnie, aby powiększyć" Foreground="#444"
+                                               FontSize="11" FontFamily="Segoe UI" Margin="0,8,0,0"/>
                                 </StackPanel>
                             </StackPanel>
                         </Border>
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
+        </Grid>
+
+        <!-- Detail overlay -->
+        <Grid x:Name="DetailOverlay" Grid.Row="0" Grid.RowSpan="3"
+              Background="#CC000000" Visibility="Collapsed"
+              MouseLeftButtonDown="Overlay_BackgroundClick">
+            <Border Background="#181818" BorderBrush="#333" BorderThickness="1"
+                    CornerRadius="10" MaxWidth="1600" MaxHeight="1000"
+                    Margin="20" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                    MouseLeftButtonDown="Overlay_PanelClick">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="300"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Result image -->
+                    <Border Grid.Column="0" Background="#111" CornerRadius="8,0,0,8">
+                        <Image x:Name="DetailImage" Stretch="Uniform" Margin="12"/>
+                    </Border>
+
+                    <!-- Parameters panel -->
+                    <Border Grid.Column="1" Background="#1A1A1A" CornerRadius="0,8,8,0">
+                        <Grid Margin="20">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <StackPanel Grid.Row="0">
+                                <TextBlock x:Name="DetailFileName"
+                                           Foreground="#F0F0F0" FontSize="14" FontWeight="SemiBold"
+                                           FontFamily="Segoe UI" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                                <Border Height="1" Background="#333" Margin="0,8,0,12"/>
+                                <TextBlock Text="Wyniki analizy" Foreground="#888"
+                                           FontSize="11" FontFamily="Segoe UI" Margin="0,0,0,10"/>
+                            </StackPanel>
+
+                            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                                <TextBlock x:Name="DetailParams"
+                                           Foreground="#7FB2FF" FontFamily="Consolas"
+                                           FontSize="13" TextWrapping="Wrap"
+                                           LineHeight="22"/>
+                            </ScrollViewer>
+
+                            <Button Grid.Row="2" Content="Zamknij"
+                                    Style="{StaticResource ActionButton}"
+                                    Margin="0,16,0,0"
+                                    HorizontalAlignment="Stretch"
+                                    Click="BtnCloseDetail_Click"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Border>
         </Grid>
 
         <Border Grid.Row="2" Background="#141414" BorderBrush="#222222" BorderThickness="0,1,0,0" Height="30">
