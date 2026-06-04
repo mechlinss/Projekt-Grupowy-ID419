@@ -26,3 +26,11 @@ packages/
 *.nupkg
 *.snupkg
 
+# Python virtual environment
+scripts/venv/
+
+
+*.tif
+*.png
+*.csv
+results/
