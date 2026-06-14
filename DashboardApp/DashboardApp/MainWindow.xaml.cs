@@ -21,86 +21,160 @@ namespace DashboardApp
 
         private record ScriptEntry(string DisplayName, string RelativePath, List<ParameterDef> Params);
 
-        private static List<ParameterDef> P(params ParameterDef[] defs) => new(defs);
+        private List<ScriptEntry> _scripts = new();
 
-        private readonly List<ScriptEntry> _scripts = new()
+        private void LoadScripts()
         {
-            new("Threshold + Morphology + Contours",
-                @"scripts\threshold_morphology_contours\threshold_morphology_contours.py",
-                P(
-                    new("THRESH",      "Próg binaryzacji",          0,   255, 80),
-                    new("AREA",        "Min. obszar konturu (px²)", 1,   500, 15),
-                    new("BLUR",        "Rozmycie Gaussa (kernel)",  1,   9,   5, 2, true),
-                    new("MORPH_ITER",  "Iteracje morfologii",       1,   10,  3, 1, true),
-                    new("KERNEL",      "Rozmiar kernela morfologii",3,   7,   3, 2, true)
-                )),
+            string jsonPath = Path.Combine(ProjectRoot, @"scripts\scripts.json");
+            if (!File.Exists(jsonPath))
+            {
+                StatusLabel.Text = $"Nie znaleziono pliku scripts.json: {jsonPath}";
+                return;
+            }
 
-            new("Morphology",
-                @"scripts\another_scripts\morphology.py",
-                P(
-                    new("THRESH",      "Próg binaryzacji",          0,   255, 40),
-                    new("MIN_AREA",    "Min. obszar konturu (px²)", 1,   500, 50),
-                    new("KERNEL",      "Rozmiar kernela",           3,   7,   3, 2, true),
-                    new("OPEN_ITER",   "Iteracje otwarcia",         1,   10,  2, 1, true),
-                    new("CLOSE_ITER",  "Iteracje zamknięcia",       1,   10,  2, 1, true)
-                )),
+            try
+            {
+                var doc  = System.Text.Json.JsonDocument.Parse(File.ReadAllText(jsonPath));
+                var list = doc.RootElement.GetProperty("scripts");
 
-            new("Canny Edge Detection",
-                @"scripts\another_scripts\canny.py",
-                P(
-                    new("CANNY_T1",    "Próg Canny dolny",          0,   255, 80),
-                    new("CANNY_T2",    "Próg Canny górny",          0,   255, 90),
-                    new("KERNEL",      "Rozmiar kernela",           3,   7,   3, 2, true),
-                    new("CLOSE_ITER",  "Iteracje zamknięcia",       1,   10,  2, 1, true),
-                    new("MIN_AREA",    "Min. obszar konturu (px²)", 1,   500, 50)
-                )),
+                foreach (var s in list.EnumerateArray())
+                {
+                    var paramDefs = new List<ParameterDef>();
+                    if (s.TryGetProperty("params", out var paramsEl))
+                    {
+                        foreach (var p in paramsEl.EnumerateArray())
+                        {
+                            paramDefs.Add(new ParameterDef(
+                                Name:        p.GetProperty("name").GetString()!,
+                                DisplayName: p.GetProperty("displayName").GetString()!,
+                                Min:         p.GetProperty("min").GetDouble(),
+                                Max:         p.GetProperty("max").GetDouble(),
+                                Default:     p.GetProperty("default").GetDouble(),
+                                Step:        p.TryGetProperty("step", out var st)  ? st.GetDouble()  : 1,
+                                SnapToTick:  p.TryGetProperty("snapToTick", out var sn) && sn.GetBoolean()
+                            ));
+                        }
+                    }
 
-            new("Thresholding",
-                @"scripts\another_scripts\thresholding.py",
-                P(
-                    new("THRESH",      "Próg binaryzacji",          0,   255, 60),
-                    new("MIN_AREA",    "Min. obszar konturu (px²)", 1,   500, 50),
-                    new("KERNEL",      "Rozmiar kernela",           3,   7,   3, 2, true),
-                    new("OPEN_ITER",   "Iteracje otwarcia",         1,   10,  2, 1, true),
-                    new("CLOSE_ITER",  "Iteracje zamknięcia",       1,   10,  2, 1, true)
-                )),
-
-            new("Watershed (basic)",
-                @"scripts\another_scripts\watershed.py",
-                P(
-                    new("THRESH",      "Próg binaryzacji",          0,   255, 150),
-                    new("KERNEL",      "Rozmiar kernela",           3,   7,   3, 2, true),
-                    new("OPEN_ITER",   "Iteracje otwarcia",         1,   10,  2, 1, true),
-                    new("DIST_PCT",    "Próg odległości (%)",       5,   50,  10, 1, true)
-                )),
-
-            new("Watershed + Preprocessing",
-                @"scripts\bdd_analysis\watershed_with_preprocessing.py",
-                P(
-                    new("SIG_ALPHA",   "Sigmoid Alpha (siła)",      1,   30,  15),
-                    new("SIG_BETA",    "Sigmoid Beta×100 (próg)",   1,   50,  13),
-                    new("MIN_AREA",    "Min. obszar (px²)",         10,  500, 150),
-                    new("DIST_PCT",    "Próg odległości (%)",       5,   50,  20, 1, true),
-                    new("CLAHE_CLIP",  "CLAHE clip limit",          1,   10,  3,  1, true)
-                )),
-        };
+                    _scripts.Add(new ScriptEntry(
+                        DisplayName:  s.GetProperty("displayName").GetString()!,
+                        RelativePath: s.GetProperty("relativePath").GetString()!,
+                        Params:       paramDefs
+                    ));
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusLabel.Text = $"Błąd wczytywania scripts.json: {ex.Message}";
+            }
+        }
 
         private string ProjectRoot =>
             Path.GetFullPath(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, @"..\..\..\..\..\"));
 
-        private string PythonExe
-        {
-            get
-            {
-                var venvPython = Path.Combine(ProjectRoot, @"scripts\venv\Scripts\python.exe");
-                return File.Exists(venvPython) ? venvPython : "py";
-            }
-        }
+        private string VenvPython =>
+            Path.Combine(ProjectRoot, @"scripts\venv\Scripts\python.exe");
+
+        private string? _systemPython = null;
+
+        private string PythonExe =>
+            File.Exists(VenvPython) ? VenvPython : (_systemPython ?? "py");
 
         public MainWindow()
         {
             InitializeComponent();
+            LoadScripts();
             PopulateScriptSelector();
+            Loaded += async (_, _) => await EnsureVenvAsync();
+        }
+
+
+        private static readonly string[] PythonCandidates = { "py", "python", "python3" };
+
+        private static async Task<string?> FindSystemPythonAsync()
+        {
+            foreach (var candidate in PythonCandidates)
+            {
+                try
+                {
+                    var psi = new ProcessStartInfo(candidate, "--version")
+                    {
+                        UseShellExecute        = false,
+                        RedirectStandardOutput = true,
+                        RedirectStandardError  = true,
+                        CreateNoWindow         = true
+                    };
+                    using var proc = Process.Start(psi);
+                    if (proc == null) continue;
+                    await proc.WaitForExitAsync();
+                    if (proc.ExitCode == 0) return candidate;
+                }
+                catch {  }
+            }
+            return null;
+        }
+
+        private async Task EnsureVenvAsync()
+        {
+            if (File.Exists(VenvPython)) return;
+
+            BtnCrop.IsEnabled = false;
+            BtnLoad.IsEnabled = false;
+            StatusLabel.Text  = "Szukam Pythona...";
+
+            _systemPython = await FindSystemPythonAsync();
+
+            if (_systemPython == null)
+            {
+                StatusLabel.Text = "Nie znaleziono Pythona (py / python / python3). Zainstaluj Python i uruchom ponownie.";
+                return;
+            }
+
+            StatusLabel.Text = $"Tworzę środowisko wirtualne ({_systemPython})...";
+
+            string scriptsDir       = Path.Combine(ProjectRoot, "scripts");
+            string requirementsPath = Path.Combine(scriptsDir, "requirements.txt");
+
+            bool ok = await RunCmdAsync(_systemPython, $"-m venv \"{Path.Combine(scriptsDir, "venv")}\"");
+            if (!ok)
+            {
+                StatusLabel.Text = "Nie udało się utworzyć venv.";
+                BtnLoad.IsEnabled = true;
+                return;
+            }
+
+            StatusLabel.Text = "Instaluję zależności (opencv, numpy, matplotlib)...";
+
+            string venvPip = Path.Combine(scriptsDir, @"venv\Scripts\pip.exe");
+            ok = await RunCmdAsync(venvPip, $"install -r \"{requirementsPath}\" --quiet");
+            if (!ok)
+            {
+                StatusLabel.Text = "Błąd instalacji pakietów. Sprawdź plik requirements.txt.";
+                BtnLoad.IsEnabled = true;
+                return;
+            }
+
+            StatusLabel.Text  = "Środowisko gotowe.";
+            BtnLoad.IsEnabled = true;
+            BtnCrop.IsEnabled = _loadedImages.Count > 0;
+        }
+
+        private static async Task<bool> RunCmdAsync(string exe, string args)
+        {
+            try
+            {
+                var psi = new ProcessStartInfo(exe, args)
+                {
+                    UseShellExecute        = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError  = true,
+                    CreateNoWindow         = true
+                };
+                using var proc = Process.Start(psi)!;
+                await proc.WaitForExitAsync();
+                return proc.ExitCode == 0;
+            }
+            catch { return false; }
         }
 
         private void PopulateScriptSelector()

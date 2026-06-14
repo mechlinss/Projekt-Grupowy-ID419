@@ -34,3 +34,5 @@ scripts/venv/
 *.png
 *.csv
 results/
+
+*.dll
