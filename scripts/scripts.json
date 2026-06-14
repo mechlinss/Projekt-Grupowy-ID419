@@ -1,0 +1,69 @@
+{
+  "scripts": [
+    {
+      "displayName": "Threshold + Morphology + Contours",
+      "relativePath": "scripts\\threshold_morphology_contours\\threshold_morphology_contours.py",
+      "params": [
+        { "name": "THRESH",     "displayName": "Próg binaryzacji",           "min": 0,  "max": 255, "default": 80,  "step": 1, "snapToTick": false },
+        { "name": "AREA",       "displayName": "Min. obszar konturu (px²)",  "min": 1,  "max": 500, "default": 15,  "step": 1, "snapToTick": false },
+        { "name": "BLUR",       "displayName": "Rozmycie Gaussa (kernel)",   "min": 1,  "max": 9,   "default": 5,   "step": 2, "snapToTick": true  },
+        { "name": "MORPH_ITER", "displayName": "Iteracje morfologii",        "min": 1,  "max": 10,  "default": 3,   "step": 1, "snapToTick": true  },
+        { "name": "KERNEL",     "displayName": "Rozmiar kernela morfologii", "min": 3,  "max": 7,   "default": 3,   "step": 2, "snapToTick": true  }
+      ]
+    },
+    {
+      "displayName": "Morphology",
+      "relativePath": "scripts\\another_scripts\\morphology.py",
+      "params": [
+        { "name": "THRESH",     "displayName": "Próg binaryzacji",           "min": 0,  "max": 255, "default": 40,  "step": 1, "snapToTick": false },
+        { "name": "MIN_AREA",   "displayName": "Min. obszar konturu (px²)",  "min": 1,  "max": 500, "default": 50,  "step": 1, "snapToTick": false },
+        { "name": "KERNEL",     "displayName": "Rozmiar kernela",            "min": 3,  "max": 7,   "default": 3,   "step": 2, "snapToTick": true  },
+        { "name": "OPEN_ITER",  "displayName": "Iteracje otwarcia",          "min": 1,  "max": 10,  "default": 2,   "step": 1, "snapToTick": true  },
+        { "name": "CLOSE_ITER", "displayName": "Iteracje zamknięcia",        "min": 1,  "max": 10,  "default": 2,   "step": 1, "snapToTick": true  }
+      ]
+    },
+    {
+      "displayName": "Canny Edge Detection",
+      "relativePath": "scripts\\another_scripts\\canny.py",
+      "params": [
+        { "name": "CANNY_T1",   "displayName": "Próg Canny dolny",           "min": 0,  "max": 255, "default": 80,  "step": 1, "snapToTick": false },
+        { "name": "CANNY_T2",   "displayName": "Próg Canny górny",           "min": 0,  "max": 255, "default": 90,  "step": 1, "snapToTick": false },
+        { "name": "KERNEL",     "displayName": "Rozmiar kernela",            "min": 3,  "max": 7,   "default": 3,   "step": 2, "snapToTick": true  },
+        { "name": "CLOSE_ITER", "displayName": "Iteracje zamknięcia",        "min": 1,  "max": 10,  "default": 2,   "step": 1, "snapToTick": true  },
+        { "name": "MIN_AREA",   "displayName": "Min. obszar konturu (px²)",  "min": 1,  "max": 500, "default": 50,  "step": 1, "snapToTick": false }
+      ]
+    },
+    {
+      "displayName": "Thresholding",
+      "relativePath": "scripts\\another_scripts\\thresholding.py",
+      "params": [
+        { "name": "THRESH",     "displayName": "Próg binaryzacji",           "min": 0,  "max": 255, "default": 60,  "step": 1, "snapToTick": false },
+        { "name": "MIN_AREA",   "displayName": "Min. obszar konturu (px²)",  "min": 1,  "max": 500, "default": 50,  "step": 1, "snapToTick": false },
+        { "name": "KERNEL",     "displayName": "Rozmiar kernela",            "min": 3,  "max": 7,   "default": 3,   "step": 2, "snapToTick": true  },
+        { "name": "OPEN_ITER",  "displayName": "Iteracje otwarcia",          "min": 1,  "max": 10,  "default": 2,   "step": 1, "snapToTick": true  },
+        { "name": "CLOSE_ITER", "displayName": "Iteracje zamknięcia",        "min": 1,  "max": 10,  "default": 2,   "step": 1, "snapToTick": true  }
+      ]
+    },
+    {
+      "displayName": "Watershed (basic)",
+      "relativePath": "scripts\\another_scripts\\watershed.py",
+      "params": [
+        { "name": "THRESH",     "displayName": "Próg binaryzacji",           "min": 0,  "max": 255, "default": 150, "step": 1, "snapToTick": false },
+        { "name": "KERNEL",     "displayName": "Rozmiar kernela",            "min": 3,  "max": 7,   "default": 3,   "step": 2, "snapToTick": true  },
+        { "name": "OPEN_ITER",  "displayName": "Iteracje otwarcia",          "min": 1,  "max": 10,  "default": 2,   "step": 1, "snapToTick": true  },
+        { "name": "DIST_PCT",   "displayName": "Próg odległości (%)",        "min": 5,  "max": 50,  "default": 10,  "step": 1, "snapToTick": true  }
+      ]
+    },
+    {
+      "displayName": "Watershed + Preprocessing",
+      "relativePath": "scripts\\bdd_analysis\\watershed_with_preprocessing.py",
+      "params": [
+        { "name": "SIG_ALPHA",  "displayName": "Sigmoid Alpha (siła)",       "min": 1,  "max": 30,  "default": 15,  "step": 1, "snapToTick": false },
+        { "name": "SIG_BETA",   "displayName": "Sigmoid Beta×100 (próg)",    "min": 1,  "max": 50,  "default": 13,  "step": 1, "snapToTick": false },
+        { "name": "MIN_AREA",   "displayName": "Min. obszar (px²)",          "min": 10, "max": 500, "default": 150, "step": 1, "snapToTick": false },
+        { "name": "DIST_PCT",   "displayName": "Próg odległości (%)",        "min": 5,  "max": 50,  "default": 20,  "step": 1, "snapToTick": true  },
+        { "name": "CLAHE_CLIP", "displayName": "CLAHE clip limit",           "min": 1,  "max": 10,  "default": 3,   "step": 1, "snapToTick": true  }
+      ]
+    }
+  ]
+}
